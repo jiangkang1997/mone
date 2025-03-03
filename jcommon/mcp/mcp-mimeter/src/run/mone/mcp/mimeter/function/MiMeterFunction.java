@@ -16,6 +16,9 @@ import java.util.function.Function;
 @Slf4j
 public class MiMeterFunction implements Function<Map<String, Object>, McpSchema.CallToolResult> {
 
+    private final String MIMETER_URL = "http://10.136.154.29:8081/mcp";
+    private final String GET_REPORT_INFO_URL = "/report/info/details?reportId=%s";
+
     private final String name = "MiMeter";
 
     private final String desc = "Mimeter's operating tool can be used to query pressure testing results";
@@ -26,7 +29,7 @@ public class MiMeterFunction implements Function<Map<String, Object>, McpSchema.
                 "properties": {
                     "operation": {
                         "type": "string",
-                        "description": "Operation type for MiMeter:\\n1. getResult: Get pressure testing result'"
+                        "description": "Operation type for MiMeter:\\n1. getReport: Get pressure testing report'"
                     },
                     "reportId": {
                         "type": "string",
@@ -45,7 +48,7 @@ public class MiMeterFunction implements Function<Map<String, Object>, McpSchema.
 
         try {
             String result = switch (operation) {
-                case "getResult" -> {
+                case "getReport" -> {
                     String reportId = (String) args.get("reportId");
                     if (reportId == null) {
                         throw new IllegalArgumentException("reportId is required for getResult operation");
@@ -63,7 +66,7 @@ public class MiMeterFunction implements Function<Map<String, Object>, McpSchema.
 
 
     private String getReport(String reportId) {
-        String url = "https://one.mi.com/api/mimeter/api/bench/report/info/details?reportId=%s";
+        String url = MIMETER_URL + GET_REPORT_INFO_URL;
         url = String.format(url, reportId);
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
